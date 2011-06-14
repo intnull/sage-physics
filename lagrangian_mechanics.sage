@@ -1,6 +1,6 @@
-def general_derivative(f, x):
+def formal_derivative(f, x):
     r"""
-    The derivative of f with respect to the symbolic function x.
+    The formal derivative of f with respect to the symbolic function x.
     """
     tempX = SR.symbol()
     return f.subs_expr({x: tempX}).diff(tempX).subs_expr({tempX: x})
@@ -9,7 +9,7 @@ def euler_lagrange_equation(L, q):
     r"""
     The Euler-Lagrange equation corresponding to the generalized coordinate q.
     """
-    return diff(general_derivative(L, diff(q, t)), t) == general_derivative(L, q)
+    return diff(formal_derivative(L, diff(q, t)), t) == formal_derivative(L, q)
 
 def dynamical_var(s):
     r"""
