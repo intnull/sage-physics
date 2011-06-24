@@ -2,12 +2,11 @@ sage-physics:
     tools to easily get the equations of motion of a system in sagemath
 
 Example: (harmonic oscillator)
-    load('lagrangian_mechanics.sage')
-    var('t, m, k')
-    dynamical_var('q')
-    T = m/2 * diff(q, t)^2
+    load('analytical_mechanics.sage')
+    var('k')
+    T = kinetic_energy(dot(q))
     V = k/2 * q^2
-    L = T - V
-    euler_lagrange_equation(L.simplify_full(), q)
+    L = (T - V).simplify_full()
+    euler_lagrange_equation(L)
 
     output: m*D[0, 0](q)(t) == -k*q(t)
