@@ -46,14 +46,13 @@ def dynamical_var(s):
         G[s] = function(s, t)
         return G[s] 
 
-def kinetic_energy(v, m=m, n=1):
+def kinetic_energy(v, m=m, s=1):
     r"""
     The kinetic energy.
     """
-    if n > 1:
-        k = len(v)
+    if s > 1:
         sum = 0
-        for i in range(k):
+        for i in range(len(v)):
             sum += m[i]/2 * (v[i] * v[i])
         return sum
     else:
