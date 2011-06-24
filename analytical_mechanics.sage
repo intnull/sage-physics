@@ -46,18 +46,18 @@ def dynamical_var(s):
         G[s] = function(s, t)
         return G[s] 
 
-def kinetic_energy(v, m=m):
+def kinetic_energy(v, m=m, n=1):
     r"""
     The kinetic energy.
     """
-    try:
+    if n > 1:
         k = len(v)
         sum = 0
         for i in range(k):
-            sum += m[i]/2 * v[i]^2
+            sum += m[i]/2 * (v[i] * v[i])
         return sum
-    except TypeError:
-        return m/2 * v^2
+    else:
+        return m/2 * (v * v)
 
 dynamical_var('q, p')
 def euler_lagrange_equation(L, q=q):
