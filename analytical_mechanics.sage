@@ -68,10 +68,10 @@ def euler_lagrange_equation(L, q=q):
         n = len(q)
         result = []
         for i in range(n):
-            result.append(diff(formal_derivative(L, diff(q[i], t)), t) == formal_derivative(L, q[i]))
+            result.append(diff(formal_derivative(L, dot(q[i])), t) == formal_derivative(L, q[i]))
         return result
     except TypeError:
-        return diff(formal_derivative(L, diff(q, t)), t) == formal_derivative(L, q)
+        return diff(formal_derivative(L, dot(q)), t) == formal_derivative(L, q)
 
 def poisson_bracket(f, g, q=q, p=p):
     r"""
@@ -96,9 +96,9 @@ def hamilton_equations(H, q=q, p=p):
         n = len(q)
         result = []
         for i in range(n):
-            result.append(diff(q[i], t) == formal_derivative(H, p[i]))
+            result.append(dot(q[i]) == formal_derivative(H, p[i]))
         for i in range(n):
-            result.append(diff(p[i], t) == - formal_derivative(H, q[i]))
+            result.append(dot(p[i]) == - formal_derivative(H, q[i]))
         return result
     except TypeError:
-        return [diff(q, t) == formal_derivative(H, p), diff(p, t) == - formal_derivative(H, q)]
+        return [dot(q) == formal_derivative(H, p), dot(p) == - formal_derivative(H, q)]
