@@ -1,4 +1,4 @@
-# analytical_mechanics.sage
+# Note: this module inserts the variable t in the global namespace!
 # Conventions:
 # t = time
 # n = degrees of freedom
@@ -9,59 +9,65 @@
 # v = [v1, ..., vs] velocity vectors
 # m = [m1, ..., ms] masses
 
-from sage.all import SR, var, function, diff
-var('t, m')
+from sage.all import SR, var, function, diff, solve
+t = var('t')
 
 def dot(f):
     r"""
-    The derivative of f with respect to time.
+    The derivative of `f` with respect to time.
     """
     return diff(f, t)
 
 def formal_derivative(f, x):
     r"""
-    The formal derivative of f with respect to the symbolic function x.
+    The formal derivative of `f` with respect to the symbolic function `x`.
     """
     tempX = SR.symbol()
     return f.subs_expr({x: tempX}).diff(tempX).subs_expr({tempX: x})
     
 def dynamical_var(s):
     r"""
-    Create a formal symbolic function of t with the name s.
+    Create a formal symbolic function of `t` with the name s.
     """
     G = globals()
     if ',' in s:
         L = [i.strip() for i in s.split(',')]
-        for i in range(len(L)):
-            G[L[i]] = function(L[i], t)
-            L[i] = G[L[i]]
+        for var in L:
+            G[var] = function(var, t)
+            var = G[var]
         return tuple(L)
     elif ' ' in s:
         L = [i.strip() for i in s.split(' ')]
-        for i in range(len(L)):
-            G[L[i]] = function(L[i], t)
-            L[i] = G[L[i]]
+        for var in L:
+            G[var] = function(var, t)
+            var = G[var]
         return tuple(L)
     else:
         G[s] = function(s, t)
         return G[s] 
 
-def kinetic_energy(v, m=m, s=1):
+def kinetic_energy(v, m):
     r"""
     The kinetic energy.
+
+    EXAMPLES:
+        sage: m = var('m')
+        sage: q = dynamical_var('q')
+        sage: kinetic_energy(dot(q), m)
+        1/2*m*D[0](q)(t)^2
     """
-    if s > 1:
+    try:
+        v[0][0] # test if v is a vector of a vector
         sum = 0
-        for i in range(len(v)):
-            sum += m[i]/2 * (v[i] * v[i])
+        for s in range(len(v)):
+            sum += m[s]/2 * (v[s] * v[s])
         return sum
-    else:
+    except:
         return m/2 * (v * v)
 
-dynamical_var('q, p')
-def euler_lagrange_equation(L, q=q):
+def euler_lagrange_equation(L, q):
     r"""
-    The Euler-Lagrange equation corresponding to the generalized coordinate q.
+    The Euler-Lagrange equation corresponding to the generalized coordinate `q`.
     """
     try:
         n = len(q)
@@ -72,9 +78,9 @@ def euler_lagrange_equation(L, q=q):
     except TypeError:
         return diff(formal_derivative(L, dot(q)), t) == formal_derivative(L, q)
 
-def poisson_bracket(f, g, q=q, p=p):
+def poisson_bracket(f, g, q, p):
     r"""
-    The poisson bracket of f and g.
+    The poisson bracket of `f` and `g`.
     """
     try:
         n = len(q)
@@ -87,7 +93,7 @@ def poisson_bracket(f, g, q=q, p=p):
         return formal_derivative(f, q) * formal_derivative(g, p) - \
             formal_derivative(f, p) * formal_derivative(g, q)
 
-def hamilton_equations(H, q=q, p=p):
+def hamilton_equations(H, q, p):
     r"""
     The Hamilton equations.
     """
@@ -101,3 +107,14 @@ def hamilton_equations(H, q=q, p=p):
         return result
     except TypeError:
         return [dot(q) == formal_derivative(H, p), dot(p) == - formal_derivative(H, q)]
+
+def legendre_transformation(L, qdot, p):
+    r"""
+    The Legendre transformation of the Lagrangian `L` with respect to `qdot`.
+    """
+    # Warning: n=1 only so far
+    eqn = p == formal_derivative(L, qdot)
+    new_qdot = solve(eqn, qdot)[0].rhs()
+    new_L = L.substitute({qdot: new_qdot})
+    H = new_qdot * p - new_L
+    return H
