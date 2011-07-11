@@ -14,7 +14,7 @@ t = var('t')
 
 def dot(f):
     r"""
-    The derivative of `f` with respect to time.
+    The (partial) derivative of `f` with respect to time.
     """
     return diff(f, t)
 
@@ -112,9 +112,17 @@ def legendre_transformation(L, qdot, p):
     r"""
     The Legendre transformation of the Lagrangian `L` with respect to `qdot`.
     """
-    # Warning: n=1 only so far
-    eqn = p == formal_derivative(L, qdot)
-    new_qdot = solve(eqn, qdot)[0].rhs()
-    new_L = L.substitute({qdot: new_qdot})
-    H = new_qdot * p - new_L
+    try:
+        n = len(qdot)
+        new_qdot = []
+        for i in range(n):
+            eqn = p[i] == formal_derivative(L, qdot[i])
+            new_qdot.append(solve(eqn, qdot[i])[0].rhs())
+        new_L = L.substitute(dict(zip(qdot, new_qdot)))
+        H = sum([new_qdot[i] * p[i] for i in range(n)]) - new_L
+    except TypeError:
+        eqn = p == formal_derivative(L, qdot)
+        new_qdot = solve(eqn, qdot)[0].rhs()
+        new_L = L.substitute({qdot: new_qdot})
+        H = new_qdot * p - new_L
     return H
